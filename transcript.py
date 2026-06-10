@@ -11,5 +11,6 @@ def get_transcript(url):
     full_text = " ".join([item.text for item in transcript])
     return full_text
 
-url = input("Paste YouTube URL: ")
-print(get_transcript(url))
+if __name__ == "__main__":
+    url = input("Paste YouTube URL: ")
+    print(get_transcript(url))
