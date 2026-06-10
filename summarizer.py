@@ -1,7 +1,10 @@
+import os
+from dotenv import load_dotenv
 from groq import Groq
 from transcript import get_transcript
 
-client = Groq(api_key="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")
+load_dotenv()
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def summarize(url):
     text = get_transcript(url)
@@ -15,7 +18,7 @@ Write a clear, engaging summary in 200-250 words. Use simple language. Make it f
 KEY CONCEPTS
 List the 5-10 most important concepts from the video. One line each.
 
-ACTION ITEMS
+PLAN OF ACTION
 What should the student DO after watching this? Concrete, specific steps only.
 
 QUIZ QUESTIONS
