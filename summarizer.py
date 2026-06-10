@@ -1,4 +1,5 @@
 import os
+import json
 from dotenv import load_dotenv
 from groq import Groq
 from transcript import get_transcript
@@ -8,45 +9,49 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def summarize(url):
     text = get_transcript(url)
-    
+
     prompt = f"""
-You are an elite AI study coach. Analyze this YouTube video transcript and produce a comprehensive study package:
+You are an elite AI study coach. Analyze this YouTube video transcript and produce a comprehensive study package.
 
-SUMMARY
-Write a clear, engaging summary in 200-250 words. Use simple language. Make it feel like a smart friend explaining it.
+Respond ONLY with valid JSON in exactly this structure, no extra text:
 
-KEY CONCEPTS
-List the 5-10 most important concepts from the video. One line each.
+{{
+  "summary": "200-250 word clear, engaging summary in simple language",
+  "key_concepts": ["concept 1", "concept 2", "..."],
+  "action_items": ["action 1", "action 2", "..."],
+  "quiz": [
+    {{
+      "question": "...",
+      "options": ["a) ...", "b) ...", "c) ...", "d) ..."],
+      "answer": "b"
+    }}
+  ],
+  "flashcards": [
+    {{"front": "concept", "back": "definition/explanation"}}
+  ],
+  "mind_map": {{
+    "topic": "main topic",
+    "subtopics": [
+      {{"name": "subtopic 1", "children": ["sub-subtopic", "sub-subtopic"]}}
+    ]
+  }}
+}}
 
-PLAN OF ACTION
-What should the student DO after watching this? Concrete, specific steps only.
-
-QUIZ QUESTIONS
-Generate 5 multiple choice questions to test understanding. Format:
-Q1. question
-a) option
-b) option
-c) option
-d) option
-Answer: x
-
-FLASHCARDS
-Generate 5 flashcards. Format:
-Front: concept
-Back: definition/explanation
-
-MIND MAP STRUCTURE
-List the main topic, then subtopics, then sub-subtopics in a tree format.
+Generate 5 quiz questions and 5 flashcards.
 
 Transcript:
 {text}
 """
-    
+
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        response_format={"type": "json_object"}
     )
-    return response.choices[0].message.content
 
-url = input("Paste YouTube URL: ")
-print(summarize(url))
+    return json.loads(response.choices[0].message.content)
+
+if __name__ == "__main__":
+    url = input("Paste YouTube URL: ")
+    result = summarize(url)
+    print(json.dumps(result, indent=2))
