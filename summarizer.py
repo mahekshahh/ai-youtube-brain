@@ -55,3 +55,7 @@ if __name__ == "__main__":
     url = input("Paste YouTube URL: ")
     result = summarize(url)
     print(json.dumps(result, indent=2))
+    
+    @app.get("/")
+def root():
+    return {"status": "AI YouTube Brain backend is running"}
